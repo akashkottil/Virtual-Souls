@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "ai-chat",
+    "slug": "ai-chat",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/splash-icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#272645"
+    },
+    "ios": {
+      "scheme": "com.googleusercontent.apps.758232109197-h1tv7lqoo3j6n5f7sj96hp0n4hs8q8cc",
+      "googleServicesFile": "./GoogleService-info.plist",
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alforia.aichat",
+      "appleTeamId": "C7JKMKUQ56"
+    },
+    "android": {
+      "scheme": "758232109197-djj2a87eglkbu2een1jdcdp4550o3fst.apps.googleusercontent.com",
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.alforia.aichat"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "@react-native-firebase/app",
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "58bca755-f254-4e30-b473-90f941909eff"
+      }
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "758232109197",
+    "project_id": "aichatapp-e7c78",
+    "storage_bucket": "aichatapp-e7c78.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758232109197:android:7da9c3607a0f40e28e52c4",
+        "android_client_info": {
+          "package_name": "com.alforia.aichat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "758232109197-d9mdu5jpm199oq29n1183g1ub2jgjck7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqK_axqhDEhgHGwv9NcZUGt9iGyTkGONg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "758232109197-d9mdu5jpm199oq29n1183g1ub2jgjck7.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "758232109197-h1tv7lqoo3j6n5f7sj96hp0n4hs8q8cc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alforia.aichat"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
