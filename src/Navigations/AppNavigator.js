@@ -15,6 +15,7 @@ import Privacy from "../Screens/Privacy";
 import Subscribtion from "../Screens/Subscription";
 import ScheduleCallScreen from "../Screens/ScheduleCallScreen";
 import ScheduleScreen from "../Screens/ScheduleScreen";
+import AppointmentRequestScreen from "../Screens/AppointmentRequestScreen";
 
 export default function AppNavigator() {
   const stack = createStackNavigator();
@@ -44,6 +45,7 @@ export default function AppNavigator() {
      
       user ? (
         <>
+
           <stack.Screen name="main" component={TabNavigator} />
           <stack.Screen
             name="Chat"
@@ -56,9 +58,12 @@ export default function AppNavigator() {
           <stack.Screen name="privacy" component={Privacy} />
           <stack.Screen name="plan" component={Subscribtion} />
           <stack.Screen name="schedule" component={ScheduleScreen} />
+          <stack.Screen name="appointment" component={AppointmentRequestScreen}/>
         </>
+
       ) : (
         <>
+
           <stack.Screen name="login" component={Login} />
           <stack.Screen
             name="SignUp"
@@ -71,6 +76,7 @@ export default function AppNavigator() {
             options={{ title: "Forgot Password" }}
           />
         </>
+
       )}
     </stack.Navigator>
   );

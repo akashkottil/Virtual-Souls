@@ -27,18 +27,19 @@ const App = () => {
   // }
 
   return (
-    // <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#010101' }}>
-    //   <NavigationContainer>
-    //     <StatusBar style="light" backgroundColor="#010101" translucent={false} />
-    //     <AppNavigator/>
-    //   </NavigationContainer>
-    // </GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1, backgroundColor: '#010101' }}>
+      <NavigationContainer>
+        <StatusBar style="light" backgroundColor="#010101" translucent={false} />
+        <AppNavigator/>
+      </NavigationContainer>
+    </GestureHandlerRootView>
 
-    <>
-    <NavigationContainer>
-    <AppointmentRequestScreen/>
-    </NavigationContainer>
-    </>
+    // <>
+    // <NavigationContainer>
+    // {/* <ScheduleScreen route={{params:{botName: "Bot Name", botImage: "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"}}}/> */}
+    // <AppointmentRequestScreen/>
+    // </NavigationContainer>
+    // </>
   );
 };
 
