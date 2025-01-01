@@ -17,7 +17,8 @@
       "googleServicesFile": "./GoogleService-info.plist",
       "supportsTablet": true,
       "bundleIdentifier": "com.alforia.aichat",
-      "appleTeamId": "C7JKMKUQ56"
+      "appleTeamId": "C7JKMKUQ56",
+      "buildNumber": "3"
     },
     "android": {
       "scheme": "758232109197-djj2a87eglkbu2een1jdcdp4550o3fst.apps.googleusercontent.com",
@@ -26,7 +27,9 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.alforia.aichat"
+      "package": "com.alforia.aichat",
+      "versionCode": 3,
+      "version": "3.0.1"
     },
     "web": {
       "favicon": "./assets/favicon.png"
