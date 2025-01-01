@@ -16,6 +16,7 @@ import Subscribtion from "../Screens/Subscription";
 import ScheduleCallScreen from "../Screens/ScheduleCallScreen";
 import ScheduleScreen from "../Screens/ScheduleScreen";
 import AppointmentRequestScreen from "../Screens/AppointmentRequestScreen";
+import Plan from "../Screens/Plan";
 
 export default function AppNavigator() {
   const stack = createStackNavigator();
@@ -56,7 +57,7 @@ export default function AppNavigator() {
           <stack.Screen name="terms" component={Terms} />
           <stack.Screen name="book" component={ScheduleCallScreen} />
           <stack.Screen name="privacy" component={Privacy} />
-          <stack.Screen name="plan" component={Subscribtion} />
+          <stack.Screen name="plan" component={Plan} />
           <stack.Screen name="schedule" component={ScheduleScreen} />
           <stack.Screen name="appointment" component={AppointmentRequestScreen}/>
         </>

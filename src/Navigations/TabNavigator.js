@@ -105,13 +105,13 @@ export default function TabNavigator() {
           tabBarLabel: 'Home'
         }}
       />
-        <Tab.Screen 
+        {/* <Tab.Screen 
           name="appointment" 
           component={AppointmentRequestScreen}
           options={{
             tabBarLabel: 'schedules'
           }}
-        />
+        /> */}
       <Tab.Screen 
         name="Profile" 
         component={Profile}

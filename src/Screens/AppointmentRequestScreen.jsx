@@ -17,6 +17,8 @@ import { LinearGradient } from "expo-linear-gradient";
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { BlurView } from 'expo-blur';
 import { TextInput } from 'react-native';
+import DeclineModal from '../Components/Modals/DeclineModal';
+import AcceptModal from '../Components/Modals/AcceptModal';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -294,228 +296,6 @@ const AppointmentRequestScreen = () => {
     }
   };
 
-  const AcceptModal = ({ appointment }) => (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={showAcceptModal}
-      onRequestClose={() => setShowAcceptModal(false)}
-    >
-      <BlurView intensity={20} style={StyleSheet.absoluteFill} tint="dark">
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowAcceptModal(false)}
-        >
-          <TouchableOpacity 
-            activeOpacity={1} 
-            onPress={(e) => e.stopPropagation()}
-            style={styles.modalContentWrapper}
-          >
-            <LinearGradient
-              colors={['#1B0927', '#27012D']}
-              style={styles.modalContent}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-            >
-              <View style={styles.modalHeader}>
-                <View style={styles.userInfo}>
-                  <Image source={appointment?.image} style={styles.modalAvatar} />
-                  <View>
-                    <Text style={styles.modalName}>{appointment?.name}</Text>
-                    <Text style={styles.modalLocation}>{appointment?.location}</Text>
-                  </View>
-                </View>
-                <TouchableOpacity onPress={() => {
-                  setShowAcceptModal(false);
-                  setShowTimePicker(false);
-                }}>
-                  <Icon name="close" size={24} color="#fff" />
-                </TouchableOpacity>
-              </View>
-
-              <Text style={styles.modalSubject}>Subject: {appointment?.subject}</Text>
-              
-              <View style={styles.dateTimeContainer}>
-                <View style={styles.timeLabel}>
-                  <Icon name="calendar-today" size={20} color="#fff" />
-                  <Text style={styles.timeText}>Date</Text>
-                  <Text style={styles.selectedTime}>{appointment?.date}</Text>
-                </View>
-              </View>
-
-              <TouchableOpacity 
-                style={styles.timePickerButton}
-                onPress={() => setShowTimePicker(!showTimePicker)}
-              >
-                <View style={styles.timeLabel}>
-                  <Icon name="schedule" size={20} color="#fff" />
-                  <Text style={styles.timeText}>Set Time</Text>
-                  <Text style={styles.selectedTime}>{formatTime()}</Text>
-                </View>
-              </TouchableOpacity>
-
-              {showTimePicker && (
-                <View style={styles.customTimePickerContainer}>
-                  <View style={styles.timePickerWrapper}>
-                    <TimePickerColumn
-                      data={hours}
-                      selected={selectedHour}
-                      onSelect={setSelectedHour}
-                      width={'30%'}
-                    />
-                    <Text style={styles.timeSeparator}>:</Text>
-                    <TimePickerColumn
-                      data={minutes}
-                      selected={selectedMinute}
-                      onSelect={setSelectedMinute}
-                      width={'30%'}
-                    />
-                    <TimePickerColumn
-                      data={periods}
-                      selected={selectedPeriod}
-                      onSelect={setSelectedPeriod}
-                      width={'25%'}
-                    />
-                  </View>
-                </View>
-              )}
-
-              <View style={styles.modalActions}>
-                <TouchableOpacity 
-                  style={[styles.modalButton]}
-                  onPress={() => {
-                    setShowAcceptModal(false);
-                    setShowTimePicker(false);
-                  }}
-                >
-                  <LinearGradient
-                    colors={['#9B3EC1', '#BF2754']}
-                    style={[styles.gradientBorder, StyleSheet.absoluteFill]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 0, y: 1 }}
-                  >
-                    <View style={styles.innerDeclineButton}>
-                      <Text style={styles.buttonText}>Cancel</Text>
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={[styles.modalButton]}
-                  onPress={handleSchedule}
-                >
-                  <LinearGradient
-                    colors={['#9B3EC1', '#BF2754']}
-                    style={[styles.scheduleButton, StyleSheet.absoluteFill]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    <Text style={styles.buttonText}>Schedule</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        </TouchableOpacity>
-      </BlurView>
-    </Modal>
-  );
-
-  const DeclineModal = ({ appointment }) => (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={showDeclineModal}
-      onRequestClose={() => setShowDeclineModal(false)}
-    >
-      <KeyboardAvoidingView 
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
-        <BlurView intensity={20} style={[StyleSheet.absoluteFill]} tint="dark">
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContentWrapper}>
-              <LinearGradient
-                colors={['#1B0927', '#27012D']}
-                style={styles.modalContent}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 0, y: 1 }}
-              >
-                <View style={styles.modalHeader}>
-                  <View style={styles.userInfo}>
-                    <Image source={appointment?.image} style={styles.modalAvatar} />
-                    <View>
-                      <Text style={styles.modalName}>{appointment?.name}</Text>
-                      <Text style={styles.modalLocation}>{appointment?.location}</Text>
-                    </View>
-                  </View>
-                </View>
-
-                <Text style={styles.modalSubject}>Subject: {appointment?.subject}</Text>
-                
-                <View style={styles.dateTimeContainer}>
-                  <View style={styles.timeLabel}>
-                    <Icon name="calendar-today" size={20} color="#fff" />
-                    <Text style={styles.timeText}>Date</Text>
-                    <Text style={styles.selectedTime}>{appointment?.date}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.reasonContainer}>
-                  <Text style={styles.reasonLabel}>Reason for declining:</Text>
-                  <TextInput
-                    style={styles.reasonInput}
-                    placeholder="Type your reason here..."
-                    placeholderTextColor="rgba(255, 255, 255, 0.5)"
-                    multiline={true}
-                    numberOfLines={4}
-                    value={declineReason}
-                    onChangeText={setDeclineReason}
-                    textAlignVertical="top"
-                  />
-                </View>
-
-                <View style={styles.modalActions}>
-                  <TouchableOpacity 
-                    style={[styles.modalButton]}
-                    onPress={() => {
-                      setShowDeclineModal(false);
-                      setDeclineReason('');
-                    }}
-                  >
-                    <LinearGradient
-                      colors={['#9B3EC1', '#BF2754']}
-                      style={[styles.gradientBorder, StyleSheet.absoluteFill]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 0, y: 1 }}
-                    >
-                      <View style={styles.innerDeclineButton}>
-                        <Text style={styles.buttonText}>Cancel</Text>
-                      </View>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                  <TouchableOpacity 
-                    style={[styles.modalButton]}
-                    onPress={handleDecline}
-                  >
-                    <LinearGradient
-                      colors={['#9B3EC1', '#BF2754']}
-                      style={[styles.scheduleButton, StyleSheet.absoluteFill]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    >
-                      <Text style={styles.buttonText}>Decline</Text>
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </View>
-              </LinearGradient>
-            </View>
-          </View>
-        </BlurView>
-      </KeyboardAvoidingView>
-    </Modal>
-  );
-
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -586,8 +366,24 @@ const AppointmentRequestScreen = () => {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {renderAppointments()}
       </ScrollView>
-      <AcceptModal appointment={selectedAppointment} />
-      <DeclineModal appointment={selectedAppointment} />
+      <DeclineModal 
+        visible={showDeclineModal}
+        np={selectedAppointment}
+        onClose={() => {
+          setShowDeclineModal(false);
+          setDeclineReason('');
+        }}
+        onDecline={handleDecline}
+        declineReason={declineReason}
+        setDeclineReason={setDeclineReason}
+      />
+
+      <AcceptModal
+        visible={showAcceptModal}
+        appointment={selectedAppointment}
+        onClose={() => setShowAcceptModal(false)}
+        onSchedule={handleSchedule}
+      />
     </View>
   );
 };

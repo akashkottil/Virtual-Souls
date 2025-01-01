@@ -5,12 +5,12 @@ import {
   View,
   TextInput,
   FlatList,
-  Button,
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { auth, db } from "../Configuration/firebase";
@@ -26,15 +26,12 @@ import {
   getDoc,
   doc,
 } from "firebase/firestore";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import BackIcon from "react-native-vector-icons/MaterialIcons";
 import { windowWidth, windowHeight } from "../Constants/Dimensions";
-import { Colors } from "../Constants/Colors";
 import { Image } from 'expo-image';
-// import useSWR from 'swr'
-
-// import icons
 import Icon from "react-native-vector-icons/Ionicons";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import * as Animatable from 'react-native-animatable';
 
 const Chat = ({ route, navigation }) => {
   const { botName, botImage } = route.params;
@@ -48,9 +45,10 @@ const Chat = ({ route, navigation }) => {
   const [imagesDocs, setImagesDoc] = useState(null);
   const [isAutoScrolling, setIsAutoScrolling] = useState(true);
   const flatListRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const blurhash =
-  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+    '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
 
 
   const fetchGPTResponse = async (userMessage, actAs) => {
@@ -81,6 +79,7 @@ const Chat = ({ route, navigation }) => {
       try {
         // Get user document from 'users' collection using current user's UID
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        console.log('userDoc :', currentUser.uid);
         if (userDoc.exists()) {
           setUserName(userDoc.data().username);
           // console.log('Username:', userName);
@@ -299,65 +298,82 @@ const Chat = ({ route, navigation }) => {
     }
   };
 
-  return (
-    <>
-      {/* <KeyboardAvoidingView
-      style={styles.container}
-      // behavior={Platform.OS === "ios" ? "padding" : "height"}
-      // keyboardVerticalOffset={100}
-    > */}
-      {/* <TouchableWithoutFeedback onPress={Keyboard.dismiss}> */}
-      <View style={styles.innerContainer}>
-        <LinearGradient
-          colors={Colors.headerGradient} // Define your gradient colors
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.topbar} // Apply gradient styles
-        >
-          <View style={styles.left}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <BackIcon
-                name="arrow-back"
-                size={windowWidth * 0.06}
-                style={styles.backIcon}
+  const LoadingDots = () => {
+    const dots = [0, 1, 2];
+    return (
+      <View style={styles.botMessage}>
+        <View style={styles.botBubble}>
+          <View style={styles.loadingDotsContainer}>
+            {dots.map((dot, index) => (
+              <Animatable.View
+                key={index}
+                animation={{
+                  0: { translateY: 0 },
+                  0.5: { translateY: -5 },
+                  1: { translateY: 0 }
+                }}
+                duration={1000}
+                delay={index * 200}
+                easing="ease-in-out"
+                iterationCount="infinite"
+                style={styles.loadingDot}
               />
-            </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </View>
+    );
+  };
 
-            <View style={styles.proDetails}>
-              <Image source={{ uri: botImage }}
-                style={styles.propicimg}
-                placeholder={{ blurhash }}
-                contentFit="cover"
-                transition={1000}
-              />
-              <View>
-                <Text style={styles.name}>{botName}</Text>
-                {/* <View style={styles.statusbar}>
-                <Text style={styles.status}>Active now</Text>
-                <View style={styles.active}></View>
-              </View> */}
-              </View>
+  return (
+    <LinearGradient
+      colors={['#1A0B1F', '#000000']}
+      style={styles.container}
+    >
+      {/* Header */}
+      <LinearGradient
+        colors={['#0E000C', '#27012D']}
+        style={styles.header}
+      >
+        <View style={styles.headerLeft}>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.backButton}
+          >
+            <BackIcon name="arrow-back" size={24} color="#FFF" />
+          </TouchableOpacity>
+          <View style={styles.profileInfo}>
+            <Image
+              source={{ uri: botImage }}
+              style={styles.profileImage}
+              contentFit="cover"
+              placeholder={blurhash}
+            />
+            <View>
+              <Text style={styles.headerTitle}>{botName}</Text>
+              {/* <Text style={styles.activeStatus}>Active now</Text> */}
             </View>
           </View>
-
-          {/* Add the call icon on the right */}
-          <TouchableOpacity
-            style={styles.callIconContainer}
-            onPress={() => navigation.navigate('schedule', {
-              botImage: botImage,
-              botName: botName
-            })}
+        </View>
+        {/* <TouchableOpacity style={styles.callButton}>
+          <LinearGradient
+            colors={['#B21BF0', '#C40B42']}
+            style={styles.callButtonGradient}
           >
-            <Icon name="call-outline" size={windowWidth * 0.06} color="white" />
-          </TouchableOpacity>
-         
-        </LinearGradient>
+            <Icon name="call" size={20} color="#FFF" />
+          </LinearGradient>
+        </TouchableOpacity> */}
+      </LinearGradient>
 
+      {/* Chat Messages and Input */}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 25}
+      >
         <LinearGradient
-          colors={Colors.chatBgGradient}  // Define your gradient colors
-          start={{ x: 1, y: 1 }}
-          end={{ x: 0, y: 0 }}
-          style={styles.messageList} // New style for the gradient container
+          colors={['#27012D', '#0E000C']}
+          style={styles.messagesContainer}
         >
           <FlatList
             ref={flatListRef}
@@ -366,263 +382,284 @@ const Chat = ({ route, navigation }) => {
             onScroll={handleScroll}
             onScrollEndDrag={handleScrollEndDrag}
             renderItem={({ item }) => (
-              <View
-                style={
-                  item.user
-                    ? styles.userMessageWrapper
-                    : styles.botMessageWrapper
-                }
-              >
-                {item.user && (
-                  <View style={[styles.userMessageBox, styles.userMessage]}>
-                    <Text style={styles.userMessageText}>{item.user}</Text>
-                  </View>
-                )}
-                {item.bot && (
-                  <LinearGradient
-                    colors={Colors.chatGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={[styles.botMessageBox, styles.botMessage]}
+              <View style={[
+                styles.messageContainer,
+                item.user ? styles.userMessage : styles.botMessage
+              ]}>
+                {item.user ? (
+                  <Animatable.View 
+                    animation="fadeInRight" 
+                    duration={500}
                   >
-                    {/* Check if the bot's message contains an image extension */}
-                    {/\.(jpg|jpeg|png|gif|webp)$/i.test(item.bot) ? (
-                      <Image
-                        source={{ uri: imageUrls[item.id] }} // Use the URL associated with this message
-                        style={styles.image}
-                        placeholder={{ blurhash }}
-                        contentFit="cover"
-                      transition={1000}
-                      />
-                    //   <Image
-                    //   style={styles.botImage}
-                    //   source={{ uri: bot.imageUrl }}
-                    //   placeholder={{ blurhash }}
-                    //   contentFit="cover"
-                    //   transition={1000}
-                    // />
-                    ) : (
-                      <Text style={styles.messageText}>{item.bot}</Text>
-                    )}
-                  </LinearGradient>
+                    <View style={styles.userBubble}>
+                      <Text style={styles.messageText}>{item.user}</Text>
+                    </View>
+                    <View style={styles.userBubbleTail} />
+                  </Animatable.View>
+                ) : (
+                  <Animatable.View 
+                    animation="fadeInLeft" 
+                    duration={500}
+                  >
+                    <View style={styles.botBubble}>
+                      {item.bot && /\.(jpg|jpeg|png|gif|webp)$/i.test(item.bot) ? (
+                        imageUrls[item.id] ? (
+                          <Animatable.View animation="zoomIn" duration={500}>
+                            <Image
+                              source={{ uri: imageUrls[item.id] }}
+                              style={styles.messageImage}
+                              contentFit="cover"
+                            />
+                            <LinearGradient
+                              colors={['transparent', 'rgba(0,0,0,0.3)']}
+                              style={styles.imageOverlay}
+                            />
+                          </Animatable.View>
+                        ) : (
+                          <ActivityIndicator color="#fff" size="large" />
+                        )
+                      ) : (
+                        <Text style={styles.botmessageText}>{item.bot}</Text>
+                      )}
+                    </View>
+                    <View style={styles.botBubbleTail} />
+                  </Animatable.View>
                 )}
               </View>
             )}
+            ListFooterComponent={() => isLoading && <LoadingDots />}
           />
         </LinearGradient>
 
-        <View style={styles.inputContainer}>
+        {/* Input Area */}
+        <View style={styles.inputWrapper}>
           <LinearGradient
-            colors={Colors.inputGradient} // Define your gradient colors
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 2 }}
-            style={styles.gradientBorder} // Gradient wrapper with padding
+            colors={['#B21BF0', '#C40B42']}
+            style={styles.inputBorder}
           >
             <LinearGradient
-              colors={Colors.innerInputGradient} // Define your gradient colors
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.innerInputContainer}>
+              colors={['#27012D', '#0E000C']}
+              style={styles.inputContainer}
+            >
               <TextInput
                 style={styles.input}
-                placeholder="Type your message..."
-                placeholderTextColor="white"
                 value={text}
                 onChangeText={setText}
+                placeholder="Message..."
+                placeholderTextColor="rgba(255,255,255,0.5)"
               />
-              <LinearGradient
-                colors={Colors.buttonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.sendButtonGradient}
-              >
-                <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
-                  <Text style={styles.sendButtonText}>Send</Text>
-                  {/* <Icon name='paper-plane' size={20} color="#FFFFFF" style={styles.plane} /> */}
-                </TouchableOpacity>
-              </LinearGradient>
+              <TouchableOpacity onPress={handleSend} style={styles.sendButton}>
+                <LinearGradient
+                  colors={['#B21BF0', '#C40B42']}
+                  style={styles.sendButtonGradient}
+                >
+                  <Icon name="send" size={20} color="#FFF" />
+                </LinearGradient>
+              </TouchableOpacity>
             </LinearGradient>
           </LinearGradient>
         </View>
-      </View>
-      {/* </TouchableWithoutFeedback> */}
-      {/* </KeyboardAvoidingView> */}
-    </>
+      </KeyboardAvoidingView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#170617",
   },
-  
-  innerContainer: {
-    flex: 1,
-    backgroundColor: "#170617",
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: windowWidth * 0.04,
+    paddingVertical: windowHeight * 0.02,
+    paddingTop: Platform.OS === 'ios' ? windowHeight * 0.06 : windowHeight * 0.02,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
   },
-  messageList: {
-    flex: 1,
-    paddingHorizontal: windowWidth * 0.06,
-    paddingTop: windowHeight * 0.04
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  botMessageBox: {
-    padding: 10,
+  backButton: {
+    padding: windowWidth * 0.02,
+    marginRight: windowWidth * 0.02,
+  },
+  profileInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: windowWidth * 0.1,
+    height: windowWidth * 0.1,
     borderRadius: windowWidth * 0.05,
-    maxWidth: "80%",
-    marginBottom: 10,
-    borderBottomLeftRadius: 0
+    marginRight: windowWidth * 0.03,
   },
-  userMessageBox: {
-    padding: 10,
-    borderRadius: windowWidth * 0.05,
-    maxWidth: "80%",
-    marginBottom: 10,
-    borderBottomRightRadius: 0
-  },
-  userMessageText: {
+  headerTitle: {
+    color: '#FFF',
     fontSize: windowWidth * 0.045,
-    color: "black",
+    fontWeight: '600',
   },
-  messageText: {
-    fontSize: windowWidth * 0.045,
-    color: "white",
+  activeStatus: {
+    color: '#4CAF50',
+    fontSize: windowWidth * 0.035,
   },
-  userMessageWrapper: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
+  callButton: {
+    width: windowWidth * 0.12,
+    height: windowWidth * 0.12,
   },
-  botMessageWrapper: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    marginBottom: 10,
+  callButtonGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: windowWidth * 0.06,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  messagesContainer: {
+    flex: 1,
+    paddingVertical: windowHeight * 0.01,
+  },
+  messageContainer: {
+    marginVertical: windowHeight * 0.005,
+    marginHorizontal: windowWidth * 0.04,
   },
   userMessage: {
-    backgroundColor: Colors.userChat,
-    alignSelf: "flex-end",
-
+    alignItems: 'flex-end',
   },
   botMessage: {
-    backgroundColor: "#522FDC",
-    alignSelf: "flex-start",
+    alignItems: 'flex-start',
   },
-  gradientBorder: {
-    padding: windowHeight * 0.002, // Padding for the gradient border
+  userBubble: {
+    backgroundColor: '#FFFFFF',
+    maxWidth: windowWidth * 0.7,
+    padding: windowWidth * 0.035,
     borderRadius: windowWidth * 0.05,
+    borderBottomRightRadius:0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    position: 'relative',
   },
-  innerInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: windowWidth * 0.05, // Same as gradientBorder to ensure alignment
+  userBubbleTail: {
+    position: 'absolute',
+    right: -8,
+    bottom: -2.5,
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderBottomWidth: 12,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#FFFFFF',
+    transform: [{ rotate: '125deg' }],
+  },
+  botBubble: {
+    backgroundColor: '#6A0DAD',
+    maxWidth: windowWidth * 0.7,
+    padding: windowWidth * 0.035,
+    borderRadius: windowWidth * 0.05,
+    borderBottomLeftRadius: 0,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    position: 'relative',
+  },
+  botBubbleTail: {
+    position: 'absolute',
+    left: -8,
+    bottom: -2.8,
+    width: 0,
+    height: 0,
+    backgroundColor: 'transparent',
+    borderStyle: 'solid',
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderBottomWidth: 12,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderBottomColor: '#6A0DAD',
+    transform: [{ rotate: '-125deg' }],
+  },
+  loadingDotsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: windowWidth * 0.04,
-    paddingVertical: windowWidth * 0.01 // Inner padding
+    paddingVertical: windowWidth * 0.02,
+    gap: 4,
+  },
+  loadingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 2,
+  },
+  botmessageText:{
+    color: '#FFF',
+  },
+  messageText: {
+    color: '#000',
+    fontSize: windowWidth * 0.04,
+    lineHeight: windowWidth * 0.055,
+  },
+  messageImage: {
+    width: windowWidth * 0.6,
+    height: windowWidth * 0.6,
+    borderRadius: windowWidth * 0.02,
+  },
+  inputWrapper: {
+    padding: windowWidth * 0.04,
+  },
+  inputBorder: {
+    borderRadius: windowWidth * 0.06,
+    padding: 1.5, // This creates the border effect
+
   },
   inputContainer: {
-    paddingHorizontal: windowWidth * 0.08,
-    backgroundColor: "#170617",
-    paddingVertical: windowHeight * 0.01,
-    borderRadius: windowWidth * 0.05,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: windowWidth * 0.06,
+    padding: windowWidth * 0.02,
+    height: windowWidth * 0.13,
   },
   input: {
     flex: 1,
-    height: windowHeight * 0.045,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    color: "white"
-    // backgroundColor:"red"
-  },
-  image: {
-    width: windowWidth * 0.6,
-    height: windowHeight * 0.4,
-    marginTop: 0,
-    borderRadius: windowWidth * 0.05,
-  },
-
-  topbar: {
-    flexDirection: "row",
-    // backgroundColor: "white",
+    color: '#FFF',
+    fontSize: windowWidth * 0.035,
     paddingHorizontal: windowWidth * 0.04,
-    paddingVertical: windowWidth * 0.04,
-    justifyContent: "space-between",
-    // zIndex: 10,
-    // shadowColor: "black",
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 40,
-    // },
-
-    // shadowOpacity: 0.25,
-    // shadowRadius: 4,
-    // elevation: 4,
-    alignItems: "center",
-    // borderBottomColor:"black"
-  },
-  left: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: windowWidth * 0.02,
-  },
-  backIcon: {
-    height: windowWidth * 0.06,
-    width: windowWidth * 0.06,
-    color: "white",
-  },
-  propicimg: {
-    height: windowWidth * 0.11,
-    width: windowWidth * 0.11,
-    borderRadius: windowWidth * 1,
-    backgroundColor: 'gray',
-  },
-  name: {
-    fontWeight: "800",
-    fontSize: windowWidth * 0.05,
-    fontFamily: "PowerGrotesk-Regular",
-    color: Colors.white,
-  },
-  // statusbar: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   justifyContent: "flex-start",
-  // },
-  // status: {
-  //   fontWeight: "300",
-  //   paddingRight: windowWidth * 0.03,
-  //   fontSize: windowWidth * 0.03,
-  //   paddingTop: windowWidth * 0.01,
-  //   fontFamily:'PowerGrotesk-Regular',
-  //   color:Colors.white
-  // },
-  // active: {
-  //   height: windowWidth * 0.02,
-  //   width: windowWidth * 0.02,
-  //   backgroundColor: "#00C92C",
-  //   borderRadius: windowWidth * 1,
-  //   position: "absolute",
-  //   right: 0
-  // },
-  proDetails: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 15,
-    gap: windowWidth * 0.05,
-    color: "white",
-  },
-  sendButtonGradient: {
-    borderRadius: windowWidth * 0.05, // Round the button
-    paddingVertical: windowHeight * 0.01,
-    paddingHorizontal: windowWidth * 0.05,
+    paddingVertical: windowHeight * 0.015,
+    height: windowWidth * 0.13,
   },
   sendButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: windowWidth * 0.05, // Ensure alignment with gradient radius
+    width: windowWidth * 0.12,
+    height: windowWidth * 0.12,
+    marginLeft: windowWidth * 0.02,
   },
-  sendButtonText: {
-    fontSize: windowWidth * 0.045,
-    color: "white", // Text color
-    fontWeight: "bold",
+  sendButtonGradient: {
+    width: '100%',
+    height: '100%',
+    borderRadius: windowWidth * 0.06,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-
 });
 
 export default Chat;
