@@ -2,7 +2,7 @@
   "expo": {
     "name": "ai-chat",
     "slug": "ai-chat",
-    "version": "1.0.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "icon": "./assets/splash-icon.png",
     "userInterfaceStyle": "light",
@@ -29,7 +29,7 @@
       },
       "package": "com.alforia.aichat",
       "versionCode": 3,
-      "version": "3.0.1"
+      "version": "3.0.0"
     },
     "web": {
       "favicon": "./assets/favicon.png"
